@@ -284,7 +284,7 @@ const LandingPage = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Akwaaba Airlines?</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We're committed to providing you with the best flying experience across Ghana and West Africa
+              We&aposre committed to providing you with the best flying experience across Ghana and West Africa
             </p>
           </div>
 
@@ -311,7 +311,7 @@ const LandingPage = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Popular Destinations</h2>
             <p className="text-xl text-gray-600">
-              Discover Ghana's most beautiful destinations with our special offers
+              Discover Ghana&aposs most beautiful destinations with our special offers
             </p>
           </div>
 
@@ -371,7 +371,7 @@ const LandingPage = () => {
                 <h3 className="text-2xl font-bold">Akwaaba Airlines</h3>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
-                Ghana's premier airline, connecting you to destinations across West Africa with unmatched hospitality
+                Ghana&aposs premier airline, connecting you to destinations across West Africa with unmatched hospitality
                 and service excellence.
               </p>
               <div className="flex space-x-4">
