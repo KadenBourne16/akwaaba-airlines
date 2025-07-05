@@ -36,7 +36,7 @@ const LandingPage = () => {
       description: "Explore the cultural heart of Ghana",
       image: "/placeholder.svg?height=300&width=400",
       price: "From $89",
-      duration: "1h 15m",
+      duration: "1h",
     },
     {
       title: "Accra to Tamale",
@@ -209,6 +209,7 @@ useEffect(() => {
                   <MapPin className="w-4 h-4 mr-1" />
                   To
                 </label>
+
                 <select
                   onChange={e =>
                     setDestinationSelected(prev => ({
@@ -223,6 +224,7 @@ useEffect(() => {
                   {destinationList.map((dept, index) => (
                     <option key={index} value={dept}>{dept}</option>
                   ))}
+
                 </select>
               </div>
 
@@ -318,7 +320,7 @@ useEffect(() => {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Akwaaba Airlines?</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We&aposre committed to providing you with the best flying experience across Ghana and West Africa
+              We are committed to providing you with the best flying experience across Ghana
             </p>
           </div>
 
@@ -345,7 +347,7 @@ useEffect(() => {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Popular Destinations</h2>
             <p className="text-xl text-gray-600">
-              Discover Ghana&aposs most beautiful destinations with our special offers
+              Discover Ghana most beautiful destinations with our special offers
             </p>
           </div>
 
@@ -405,7 +407,7 @@ useEffect(() => {
                 <h3 className="text-2xl font-bold">Akwaaba Airlines</h3>
               </div>
               <p className="text-gray-300 mb-6 max-w-md">
-                Ghana&aposs premier airline, connecting you to destinations across West Africa with unmatched hospitality
+                Ghana premier airline, connecting you to destinations across Ghana with unmatched hospitality
                 and service excellence.
               </p>
               <div className="flex space-x-4">
