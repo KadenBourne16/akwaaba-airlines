@@ -16,11 +16,19 @@ import {
   Clock,
   Award,
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import Link from "next/link"
 
 const LandingPage = () => {
   const [tripType, setTripType] = useState("round")
   const [activeBookSection, setActiveBookSection] = useState("BookFlight")
+  const allDestinations = ["Accra (ACC)", "Kumasi (KMS)", "Takoradi (TKD)", "Tamale (TML)"];
+  const [destinationList, setDestinationList] = useState(allDestinations);
+  const [destinationSelected, setDestinationSelected] = useState({
+    from: "",
+    to: ""
+})
+
 
   const destinations = [
     {
@@ -64,6 +72,16 @@ const LandingPage = () => {
     },
   ]
 
+useEffect(() => {
+  if (destinationSelected.from !== "") {
+    setDestinationList(
+      allDestinations.filter(destinationPlace => destinationPlace !== destinationSelected.from)
+    );
+  } else {
+    setDestinationList(allDestinations);
+  }
+}, [destinationSelected.from]);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -90,11 +108,6 @@ const LandingPage = () => {
                 </a>
               ))}
             </nav>
-
-            {/* CTA Button */}
-            <button className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-md">
-              Sign In
-            </button>
           </div>
         </div>
       </header>
@@ -174,11 +187,20 @@ const LandingPage = () => {
                   <MapPin className="w-4 h-4 mr-1" />
                   From
                 </label>
-                <select className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
+                <select
+                  onChange={e =>
+                    setDestinationSelected(prev => ({
+                      ...prev,
+                      from: e.target.value
+                    }))
+                  }
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                  value={destinationSelected.from}
+                >
                   <option value="">Select departure city</option>
-                  <option>Accra (ACC)</option>
-                  <option>Kumasi (KMS)</option>
-                  <option>Tamale (TML)</option>
+                  {allDestinations.map((dept, index) => (
+                    <option key={index} value={dept}>{dept}</option>
+                  ))}
                 </select>
               </div>
 
@@ -187,11 +209,20 @@ const LandingPage = () => {
                   <MapPin className="w-4 h-4 mr-1" />
                   To
                 </label>
-                <select className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
-                  <option value="">Select destination</option>
-                  <option>Tamale (TML)</option>
-                  <option>Ho (HO)</option>
-                  <option>Takoradi (TKD)</option>
+                <select
+                  onChange={e =>
+                    setDestinationSelected(prev => ({
+                      ...prev,
+                      to: e.target.value
+                    }))
+                  }
+                  className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                  value={destinationSelected.to}
+                >
+                  <option value="">Select end destination</option>
+                  {destinationList.map((dept, index) => (
+                    <option key={index} value={dept}>{dept}</option>
+                  ))}
                 </select>
               </div>
 
@@ -269,10 +300,13 @@ const LandingPage = () => {
 
             {/* Search Button */}
             <div className="text-center">
-              <button className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-12 py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-lg flex items-center mx-auto">
+              <Link
+                href="/flight-section"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-12 py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-lg flex items-center mx-auto justify-center"
+              >
                 <Send className="w-5 h-5 mr-2" />
-                Search Flights
-              </button>
+                Book Flights
+              </Link>
             </div>
           </div>
         </div>

@@ -1,0 +1,30 @@
+Pricing for your simulation airline website depends on several factors, including:
+
+1. Distance between cities: Longer distances typically cost more.
+2. Demand and supply: Popular routes or peak travel times may warrant higher prices.
+3. Operating costs: Fuel, maintenance, and other expenses influence pricing.
+
+For your Ghana-based simulation, let's assume a simple pricing structure based on distance. Here's a rough estimate of distances between cities:
+
+1. Kumasi - Accra: 250 km (155 miles)
+2. Kumasi - Tamale: 340 km (211 miles)
+3. Kumasi - Takoradi: 290 km (180 miles)
+4. Accra - Tamale: 590 km (367 miles)
+5. Accra - Takoradi: 220 km (137 miles)
+6. Tamale - Takoradi: 630 km (391 miles)
+
+You can use a base price per kilometer or mile. Let's assume:
+
+- Short-haul flights (less than 300 km): $0.10 per km
+- Medium-haul flights (300-600 km): $0.12 per km
+- Long-haul flights (more than 600 km): $0.15 per km
+
+Apply these rates to calculate prices:
+
+1. Kumasi - Accra: 250 km * $0.10 = $25
+2. Kumasi - Tamale: 340 km * $0.12 = $40.80
+3. Kumasi - Takoradi: 290 km * $0.10 = $29
+4. Accra - Tamale: 590 km * $0.12 = $70.80
+5. Accra - Takoradi: 220 km * $0.10 = $22
+6. Tamale - Takoradi: 630 km * $0.15 = $94.50
+
