@@ -1,70 +1,70 @@
 {
-  "Accra": {
-    "Kumasi": {
+  "Accra (ACC)": {
+    "Kumasi (KMS)": {
       "distance": "201",
       "metric": "km",
       "flight_time": "0 hours 50 minutes"
     },
-    "Tamale": {
+    "Tamale (TML)": {
       "distance": "433",
       "metric": "km",
       "flight_time": "1 hour"
     },
-    "Takoradi": {
+    "Takoradi (TKD)": {
       "distance": "220",
       "metric": "km",
       "flight_time": "40 minutes"
     }
   },
-  "Kumasi": {
-    "Accra": {
+  "Kumasi (KMS)": {
+    "Accra (ACC)": {
       "distance": "201",
       "metric": "km",
       "flight_time": "0 hours 50 minutes"
     },
-    "Tamale": {
+    "Tamale (TML)": {
       "distance": "340",
       "metric": "km",
       "flight_time": "2 hours 40 minutes"
     },
-    "Takoradi": {
+    "Takoradi (TKD)": {
       "distance": "290",
       "metric": "km",
       "flight_time": "2 hours 10 minutes"
     }
   },
-  "Tamale": {
-    "Accra": {
+  "Tamale (TML)": {
+    "Accra (ACC)": {
       "distance": "433",
       "metric": "km",
       "flight_time": "1 hour 20 minutes"
     },
-    "Kumasi": {
+    "Kumasi (KMS)": {
       "distance": "340",
       "metric": "km",
       "flight_time": "Not available"
     },
-    "Takoradi": {
+    "Takoradi (TKD)": {
       "distance": "630",
       "metric": "km",
-      "flight_time": "Not available"
+      "flight_time": "3 hours"
     }
   },
-  "Takoradi": {
-    "Accra": {
+  "Takoradi (TKD)": {
+    "Accra (ACC)": {
       "distance": "220",
       "metric": "km",
-      "flight_time": "Not available"
+      "flight_time": "40  minutes"
     },
-    "Kumasi": {
+    "Kumasi (KMS)": {
       "distance": "290",
       "metric": "km",
-      "flight_time": "Not available"
+      "flight_time": "2 hours 10 minutes"
     },
-    "Tamale": {
+    "Tamale (TML)": {
       "distance": "630",
       "metric": "km",
-      "flight_time": "Not available"
+      "flight_time": "3 hours"
     }
   }
 }

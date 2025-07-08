@@ -20,35 +20,61 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 
 const LandingPage = () => {
-  const [tripType, setTripType] = useState("round")
-  const [activeBookSection, setActiveBookSection] = useState("BookFlight")
+  const [tripType, setTripType] = useState("round");
+  const [activeBookSection, setActiveBookSection] = useState("BookFlight");
   const allDestinations = ["Accra (ACC)", "Kumasi (KMS)", "Takoradi (TKD)", "Tamale (TML)"];
   const [destinationList, setDestinationList] = useState(allDestinations);
-  const [destinationSelected, setDestinationSelected] = useState({
+  const [destinationSelected, setDestinationSelected] = useState({ from: "", to: "" });
+  const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [pnr, setPnr] = useState("");
+  const [surname, setSurname] = useState("");
+  const [formData, setFormData] = useState({
     from: "",
-    to: ""
-})
+    to: "",
+    departure: "",
+    return: "",
+    adults: 0,
+    child: 0,
+    infants: 0,
+  });
 
+useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      from: destinationSelected.from,
+      to: destinationSelected.to,
+      departure: departureDate,
+      return: tripType === "round" ? returnDate : "",
+    }));
+  }, [destinationSelected, departureDate, returnDate, tripType]);
+
+
+const saveToIndexedDB = (formData) => {
+  const dataToStore = JSON.stringify(formData);
+  localStorage.setItem("flightFormData", dataToStore);
+  console.log("Done", dataToStore)
+}
 
   const destinations = [
     {
       title: "Accra to Kumasi",
       description: "Explore the cultural heart of Ghana",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "/AccraDestination.jpg",
       price: "From $89",
       duration: "1h",
     },
     {
       title: "Accra to Tamale",
       description: "Discover northern Ghana's beauty",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "/GidiLodge.jpg",
       price: "From $125",
       duration: "1h 45m",
     },
     {
       title: "Accra to Takoradi",
       description: "Gateway to the western region",
-      image: "/placeholder.svg?height=300&width=400",
+      image: "/AtlanticHotel.jpg",
       price: "From $95",
       duration: "1h 30m",
     },
@@ -72,16 +98,18 @@ const LandingPage = () => {
     },
   ]
 
-useEffect(() => {
-  if (destinationSelected.from !== "") {
-    setDestinationList(
-      allDestinations.filter(destinationPlace => destinationPlace !== destinationSelected.from)
-    );
-  } else {
-    setDestinationList(allDestinations);
-  }
-}, [destinationSelected.from]);
+  useEffect(() => {
+    if (destinationSelected.from !== "") {
+      setDestinationList(
+        allDestinations.filter(destinationPlace => destinationPlace !== destinationSelected.from)
+      );
+    } else {
+      setDestinationList(allDestinations);
+    }
+  }, [destinationSelected.from]);
 
+
+  //main return statement
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -180,104 +208,140 @@ useEffect(() => {
               </button>
             </div>
 
-            {/* Booking Form */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 flex items-center">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  From
-                </label>
-                <select
-                  onChange={e =>
-                    setDestinationSelected(prev => ({
-                      ...prev,
-                      from: e.target.value
-                    }))
-                  }
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
-                  value={destinationSelected.from}
-                >
-                  <option value="">Select departure city</option>
-                  {allDestinations.map((dept, index) => (
-                    <option key={index} value={dept}>{dept}</option>
-                  ))}
-                </select>
-              </div>
+            {/* Conditional Section */}
+            {activeBookSection === "BookFlight" ? (
+              <>
+                {/* Booking Form */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div className="space-y-2">
+      <label className="text-sm font-semibold text-gray-700 flex items-center">
+        <MapPin className="w-4 h-4 mr-1" />
+        From
+      </label>
+      <select
+        onChange={e => setDestinationSelected(prev => ({
+          ...prev,
+          from: e.target.value
+        }))}
+        className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+        value={destinationSelected.from}
+      >
+        <option value="">Select departure city</option>
+        {allDestinations.map((dept, index) => (
+          <option key={index} value={dept}>{dept}</option>
+        ))}
+      </select>
+    </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 flex items-center">
-                  <MapPin className="w-4 h-4 mr-1" />
-                  To
-                </label>
+    <div className="space-y-2">
+      <label className="text-sm font-semibold text-gray-700 flex items-center">
+        <MapPin className="w-4 h-4 mr-1" />
+        To
+      </label>
+      <select
+        onChange={e => setDestinationSelected(prev => ({
+          ...prev,
+          to: e.target.value
+        }))}
+        className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+        value={destinationSelected.to}
+      >
+        <option value="">Select end destination</option>
+        {destinationList.map((dept, index) => (
+          <option key={index} value={dept}>{dept}</option>
+        ))}
+      </select>
+    </div>
 
-                <select
-                  onChange={e =>
-                    setDestinationSelected(prev => ({
-                      ...prev,
-                      to: e.target.value
-                    }))
-                  }
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
-                  value={destinationSelected.to}
-                >
-                  <option value="">Select end destination</option>
-                  {destinationList.map((dept, index) => (
-                    <option key={index} value={dept}>{dept}</option>
-                  ))}
+    <div className="space-y-2">
+      <label className="text-sm font-semibold text-gray-700 flex items-center">
+        <Calendar className="w-4 h-4 mr-1" />
+        Departure
+      </label>
+      <input
+        type="date"
+        className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+        value={departureDate}
+        onChange={e => setDepartureDate(e.target.value)}
+      />
+    </div>
 
-                </select>
-              </div>
+    {/* Show return date only if round trip */}
+    {tripType === "round" && (
+      <div className="space-y-2">
+        <label className="text-sm font-semibold text-gray-700 flex items-center">
+          <Calendar className="w-4 h-4 mr-1" />
+          Return
+        </label>
+        <input
+          type="date"
+          className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+          value={returnDate}
+          onChange={e => setReturnDate(e.target.value)}
+          min={departureDate}
+        />
+      </div>
+    )}
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 flex items-center">
-                  <Calendar className="w-4 h-4 mr-1" />
-                  Departure
-                </label>
-                <input
-                  type="date"
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
-                />
-              </div>
+    <div className="space-y-2">
+      <label className="text-sm font-semibold text-gray-700 flex items-center">
+        <Users className="w-4 h-4 mr-1" />
+        Adults
+      </label>
+      <select
+        value={formData.adults}
+        onChange={e => setFormData(prev => ({
+          ...prev,
+          adults: Number(e.target.value)
+        }))}
+        className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+      >
+        {[...Array(9)].map((_, i) => (
+          <option key={i} value={i + 1}>
+            {i + 1} Adult{i > 0 ? "s" : ""}
+          </option>
+        ))}
+      </select>
+    </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 flex items-center">
-                  <Users className="w-4 h-4 mr-1" />
-                  Adults
-                </label>
-                <select className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
-                  {[...Array(9)].map((_, i) => (
-                    <option key={i} value={i + 1}>
-                      {i + 1} Adult{i > 0 ? "s" : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
+    <div className="space-y-2">
+      <label className="text-sm font-semibold text-gray-700">Children</label>
+      <select
+        value={formData.child}
+        onChange={e => setFormData(prev => ({
+          ...prev,
+          child: Number(e.target.value)
+        }))}
+        className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+      >
+        {[...Array(8)].map((_, i) => (
+          <option key={i} value={i}>
+            {i} Child{i !== 1 ? "ren" : ""}
+          </option>
+        ))}
+      </select>
+    </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700">Children</label>
-                <select className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
-                  {[...Array(8)].map((_, i) => (
-                    <option key={i} value={i}>
-                      {i} Child{i !== 1 ? "ren" : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
+    <div className="space-y-2">
+      <label className="text-sm font-semibold text-gray-700">Infants - <span className="text-xs text-gray-400">14 days to 2 years</span></label>
+      <select
+        value={formData.infants}
+        onChange={e => setFormData(prev => ({
+          ...prev,
+          infants: Number(e.target.value)
+        }))}
+        className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+      >
+        {[...Array(4)].map((_, i) => (
+          <option key={i} value={i}>
+            {i} Infant{i !== 1 ? "s" : ""}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700">Infants</label>
-                <select className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
-                  {[...Array(4)].map((_, i) => (
-                    <option key={i} value={i}>
-                      {i} Infant{i !== 1 ? "s" : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Trip Type */}
-            <div className="flex items-center space-x-6 mb-8">
+    <div className="flex items-center space-x-6 mb-8">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="radio"
@@ -300,16 +364,54 @@ useEffect(() => {
               </label>
             </div>
 
-            {/* Search Button */}
-            <div className="text-center">
-              <Link
-                href="/flight-section"
-                className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-12 py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-lg flex items-center mx-auto justify-center"
-              >
-                <Send className="w-5 h-5 mr-2" />
-                Book Flights
-              </Link>
-            </div>
+  {/* Book Flights Button */}
+  <div className="text-center">
+    <button
+      onClick={() => {
+        saveToIndexedDB(formData);
+        window.location.href = "/flight-section";
+      }}
+      className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-12 py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-lg flex items-center mx-auto justify-center"
+    >
+      <Send className="w-5 h-5 mr-2" />
+      Book Flights
+    </button>
+  </div>
+              </>
+            ) : (
+              // Check-In Section
+              <div className="max-w-md mx-auto">
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">PNR Code</label>
+                    <input
+                      type="text"
+                      className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                      placeholder="Enter your PNR code"
+                      value={pnr}
+                      onChange={e => setPnr(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-gray-700">Surname</label>
+                    <input
+                      type="text"
+                      className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                      placeholder="Enter your surname"
+                      value={surname}
+                      onChange={e => setSurname(e.target.value)}
+                    />
+                  </div>
+                  <div className="text-center">
+                    <button
+                      className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-10 py-3 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-lg"
+                    >
+                      Check In
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
