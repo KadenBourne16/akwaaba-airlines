@@ -18,11 +18,14 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import {useRouter}  from "next/navigation"
 
 const LandingPage = () => {
+  const router = useRouter();
   const [tripType, setTripType] = useState("round");
   const [activeBookSection, setActiveBookSection] = useState("BookFlight");
   const allDestinations = ["Accra (ACC)", "Kumasi (KMS)", "Takoradi (TKD)", "Tamale (TML)"];
+  
   const [destinationList, setDestinationList] = useState(allDestinations);
   const [destinationSelected, setDestinationSelected] = useState({ from: "", to: "" });
   const [departureDate, setDepartureDate] = useState("");
@@ -32,12 +35,15 @@ const LandingPage = () => {
   const [formData, setFormData] = useState({
     from: "",
     to: "",
-    departure: "",
+    departure:  "",
     return: "",
-    adults: 0,
+    adults: 1,
     child: 0,
     infants: 0,
+    trip_type: "",
   });
+  const [errors, setErrors] = useState({});
+
 
 useEffect(() => {
     setFormData(prev => ({
@@ -45,15 +51,42 @@ useEffect(() => {
       from: destinationSelected.from,
       to: destinationSelected.to,
       departure: departureDate,
-      return: tripType === "round" ? returnDate : "",
+      return: tripType === "one" ? returnDate : "",
+      trip_type: tripType,
     }));
+
+    console.log(formData.trip_type)
   }, [destinationSelected, departureDate, returnDate, tripType]);
 
 
 const saveToIndexedDB = (formData) => {
+  let newErrors = {};
+
+  if (!formData.from) {
+    newErrors.from = "Please select a departure location";
+  }
+  if (!formData.to) {
+    newErrors.to = "Please select a destination";
+  }
+  if (!formData.departure) {
+    newErrors.departure = "Please select a departure date";
+  }
+  if (formData.trip_type !== "round" && !formData.return) {
+    newErrors.return = "Please select a return date";
+  }
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    setTimeout(() => {
+      setErrors({});
+    }, 3000);
+    return;
+  }
+
   const dataToStore = JSON.stringify(formData);
   localStorage.setItem("flightFormData", dataToStore);
   console.log("Done", dataToStore)
+  router.push("/flight-section")
 }
 
   const destinations = [
@@ -61,21 +94,21 @@ const saveToIndexedDB = (formData) => {
       title: "Accra to Kumasi",
       description: "Explore the cultural heart of Ghana",
       image: "/AccraDestination.jpg",
-      price: "From $89",
+      price: "From GHc 89",
       duration: "1h",
     },
     {
       title: "Accra to Tamale",
       description: "Discover northern Ghana's beauty",
       image: "/GidiLodge.jpg",
-      price: "From $125",
+      price: "From GHc 125",
       duration: "1h 45m",
     },
     {
       title: "Accra to Takoradi",
       description: "Gateway to the western region",
       image: "/AtlanticHotel.jpg",
-      price: "From $95",
+      price: "From GHc 95",
       duration: "1h 30m",
     },
   ]
@@ -231,6 +264,7 @@ const saveToIndexedDB = (formData) => {
           <option key={index} value={dept}>{dept}</option>
         ))}
       </select>
+      {errors && errors.from && <p className="text-amber-500 text-sm">{errors.from}</p>}
     </div>
 
     <div className="space-y-2">
@@ -251,6 +285,7 @@ const saveToIndexedDB = (formData) => {
           <option key={index} value={dept}>{dept}</option>
         ))}
       </select>
+      {errors && errors.to && <p className="text-amber-500 text-sm">{errors.to}</p>}
     </div>
 
     <div className="space-y-2">
@@ -264,6 +299,7 @@ const saveToIndexedDB = (formData) => {
         value={departureDate}
         onChange={e => setDepartureDate(e.target.value)}
       />
+      {errors && errors.departure && <p className="text-amber-500 text-sm">{errors.departure}</p>}
     </div>
 
     {/* Show return date only if round trip */}
@@ -280,6 +316,7 @@ const saveToIndexedDB = (formData) => {
           onChange={e => setReturnDate(e.target.value)}
           min={departureDate}
         />
+        {errors && errors.return && <p className="text-amber-500 text-sm">{errors.return}</p>}
       </div>
     )}
 
@@ -369,7 +406,7 @@ const saveToIndexedDB = (formData) => {
     <button
       onClick={() => {
         saveToIndexedDB(formData);
-        window.location.href = "/flight-section";
+        // window.location.href = "/flight-section";
       }}
       className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-12 py-4 rounded-xl font-semibold text-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-200 shadow-lg flex items-center mx-auto justify-center"
     >

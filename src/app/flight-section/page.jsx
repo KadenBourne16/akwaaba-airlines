@@ -24,6 +24,7 @@ const FlightSection = () => {
   })
   const [theFlightInfo, setTheFlightInfo] = useState({})
   const [flightPrice, setFlightPrice] = useState(0)
+  const [currentDate, setCurrentDate] = useState("")
 
   useEffect(() =>{
     const flight_data_information = localStorage.getItem("flightFormData")
@@ -41,14 +42,14 @@ const FlightSection = () => {
       case 0:
         return (
           <div>
-            <FlightCalender/>
+            <FlightCalender setCurrentDate={setCurrentDate}/>
             <PassengerBooking/>
           </div>
         )
       case 1:
         return (
           <div>
-           Passenger
+            Passenger
           </div>
         )
       case 2:
@@ -79,10 +80,10 @@ const FlightSection = () => {
 
   const price_generator_oneway = (location_from, location_to) => {
     const pricePerKm = 3
-    // if (location_to === location_from) {
-    //   alert("locations cannot be the same")
-    //   return
-    // }
+    if (location_to === location_from) {
+      alert("locations cannot be the same")
+      return
+    }
 
 
     if (
@@ -106,7 +107,6 @@ const FlightSection = () => {
       <div
         key={step}
         className="flex flex-col items-center cursor-pointer"
-        onClick={() => setCurrentStep(idx)}
       >
         <div
           className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex items-center justify-center rounded-full font-bold mb-0.5 sm:mb-1 md:mb-1.5

@@ -2,84 +2,132 @@
 
 import { useState, useEffect } from "react"
 import { Plane, Info } from "lucide-react"
+import Location_Library from "@/json-library/location-distance.json"
 
+// Utility Functions
 function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 function pad(num) {
-  return num.toString().padStart(2, "0");
+  return num.toString().padStart(2, "0")
+}
+
+function caculateFlightDuration(location_from, location_to){
+    const speed = 500;
+    const distance = Location_Library[location_from][location_to].distance;
+    const duration = distance / speed;
+    return duration;
 }
 
 function addMinutesToTime(time, minsToAdd) {
-  const [h, m] = time.split(":").map(Number);
-  const date = new Date();
-  date.setHours(h, m + minsToAdd, 0, 0);
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  const [h, m] = time.split(":").map(Number)
+  const date = new Date()
+  date.setHours(h, m + minsToAdd, 0, 0)
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
+// Generate seat prices for a flight
+function generateAvailableSeat(location_from, location_to) {
+  const pricePerKm = 3
+
+  const seatData = {
+    Promotion: null,
+    Bronze: null,
+    Silver: null,
+    Gold: null,
+  }
+
+  if (
+    location_from &&
+    location_to &&
+    Location_Library[location_from] &&
+    Location_Library[location_from][location_to]
+  ) {
+    const distance = parseInt(Location_Library[location_from][location_to].distance)
+    const basePrice = pricePerKm * distance
+
+    Object.keys(seatData).forEach((fareClass) => {
+      if (Math.random() < 0.5) {
+        const multiplier = {
+          Promotion: 0.8,
+          Bronze: 1,
+          Silver: 1.2,
+          Gold: 1.5,
+        }[fareClass]
+        seatData[fareClass] = Math.floor(basePrice * multiplier)
+      }
+    })
+  }
+
+  return seatData
+}
+
+// Main component
 const PassengerBooking = () => {
   const [selectedFlight, setSelectedFlight] = useState(null)
-  const [flights, setFlights] = useState([]);
-
-  useEffect(() => {
-    const numFlights = getRandomInt(1, 15);
-    const flightsArr = [];
-    let usedTimes = new Set();
-
-    for (let i = 0; i < numFlights; i++) {
-      let hour = getRandomInt(6, 20);
-      let minute = getRandomInt(0, 1) === 0 ? 0 : 30;
-      let depTime = `${pad(hour)}:${pad(minute)}`;
-      while (usedTimes.has(depTime)) {
-        hour = getRandomInt(6, 20);
-        minute = getRandomInt(0, 1) === 0 ? 0 : 30;
-        depTime = `${pad(hour)}:${pad(minute)}`;
-      }
-      usedTimes.add(depTime);
-
-      const arrTime = addMinutesToTime(depTime, 50);
-
-      flightsArr.push({
-        id: `AK${pad(i + 1)}`,
-        departureTime: depTime,
-        arrivalTime: arrTime,
-        departureCity: "Accra",
-        arrivalCity: "Kumasi",
-        date: "05.07.2025",
-        duration: "50m",
-        flightType: "Nonstop",
-      });
-    }
-    setFlights(flightsArr);
-  }, []);
+  const [flights, setFlights] = useState([])
+  const [currentDate  , setCurrentDate] = useState(false);
 
   const fareClasses = [
     {
       name: "Promotion",
       color: "text-white",
       bgColor: "bg-green-500",
-      available: false,
     },
     {
       name: "Bronze",
       color: "text-white",
       bgColor: "bg-orange-600",
-      available: false,
     },
     {
       name: "Silver",
       color: "text-white",
       bgColor: "bg-gray-400",
-      available: false,
     },
     {
       name: "Gold",
       color: "text-white",
       bgColor: "bg-yellow-500",
-      available: false,
     },
   ]
+
+  useEffect(() => {
+    const numFlights = getRandomInt(1, 15)
+    const flightsArr = []
+    let usedTimes = new Set()
+    const theFlightData = localStorage.getItem("flightFormData")
+    const flightData = JSON.parse(theFlightData)
+
+    for (let i = 0; i < numFlights; i++) {
+      let hour = getRandomInt(6, 20)
+      let minute = getRandomInt(0, 1) === 0 ? 0 : 30
+      let depTime = `${pad(hour)}:${pad(minute)}`
+      while (usedTimes.has(depTime)) {
+        hour = getRandomInt(6, 20)
+        minute = getRandomInt(0, 1) === 0 ? 0 : 30
+        depTime = `${pad(hour)}:${pad(minute)}`
+      }
+      usedTimes.add(depTime)
+
+      const arrTime = addMinutesToTime(depTime, 50)
+      const seatPrices = generateAvailableSeat(flightData.from, flightData.to)
+      const duration = caculateFlightDuration(flightData.from, flightData.to)
+
+      flightsArr.push({
+        id: `AK${pad(i + 1)}`,
+        departureTime: depTime,
+        arrivalTime: arrTime,
+        departureCity: flightData.from,
+        arrivalCity: flightData.to,
+        date: "05.07.2025",
+        duration: `${duration}h`,
+        flightType: "Nonstop",
+        seatPrices,
+      })
+    }
+    setFlights(flightsArr)
+  }, [])
 
   const handleFlightInfo = (flightId) => {
     setSelectedFlight(selectedFlight === flightId ? null : flightId)
@@ -93,7 +141,6 @@ const PassengerBooking = () => {
           <div className="text-sm text-gray-600">
             Number of flights <span className="font-semibold text-gray-900">{flights.length}</span>
           </div>
-          {/* Fare Class Headers */}
           <div className="flex flex-wrap gap-2">
             {fareClasses.map((fareClass, index) => (
               <div
@@ -113,16 +160,13 @@ const PassengerBooking = () => {
           <div key={flight.id} className="bg-white rounded-lg shadow-sm border border-gray-200">
             <div className="p-3 sm:p-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                {/* Flight Details */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8 w-full md:w-auto">
-                  {/* Departure */}
                   <div className="text-left min-w-[80px]">
                     <div className="text-xl sm:text-2xl font-bold text-gray-900">{flight.departureTime}</div>
                     <div className="text-xs sm:text-sm font-medium text-gray-700">{flight.departureCity}</div>
                     <div className="text-xs text-gray-500">{flight.date}</div>
                   </div>
 
-                  {/* Flight Path */}
                   <div className="flex items-center space-x-2 min-w-[120px] sm:min-w-[200px]">
                     <div className="flex items-center space-x-2 w-full">
                       <Plane className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 transform rotate-90" />
@@ -133,29 +177,39 @@ const PassengerBooking = () => {
                     </div>
                   </div>
 
-                  {/* Arrival */}
                   <div className="text-left min-w-[80px]">
                     <div className="text-xl sm:text-2xl font-bold text-gray-900">{flight.arrivalTime}</div>
                     <div className="text-xs sm:text-sm font-medium text-gray-700">{flight.arrivalCity}</div>
                     <div className="text-xs text-gray-500">{flight.date}</div>
                   </div>
 
-                  {/* Flight Type */}
                   <div className="text-center">
                     <div className="text-xs sm:text-sm text-gray-600">{flight.flightType}</div>
                   </div>
                 </div>
 
-                {/* Fare Classes */}
+                {/* Fare Class Prices */}
                 <div className="flex flex-wrap gap-2 sm:gap-4 justify-start md:justify-end">
-                  {fareClasses.map((fareClass, index) => (
-                    <div key={index} className="w-20 sm:w-24 text-center">
-                      <div className="border border-gray-200 rounded-lg p-2 sm:p-4 bg-gray-50">
-                        <Plane className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300 mx-auto mb-1 sm:mb-2" />
-                        <div className="text-xs text-gray-400 font-medium">NO SEAT</div>
+                  {fareClasses.map((fareClass, index) => {
+                    const price = flight.seatPrices[fareClass.name]
+                    return (
+                      <div key={index} className="w-20 sm:w-24 text-center">
+                        <div >
+                          {price ? (
+                            <div className="border border-gray-200 rounded-lg p-2 sm:p-4 bg-green-500 hover:bg-green-400 hover:cursor-pointer">
+                              <Plane className="w-5 h-5 sm:w-6 sm:h-6 text-white mx-auto mb-1 sm:mb-2" />
+                              <div className="text-xs text-white font-semibold">₵{price}</div>
+                            </div>
+                          ) : (
+                            <div className="border border-gray-200 rounded-lg p-2 sm:p-4 bg-gray-50">
+                              <Plane className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300 mx-auto mb-1 sm:mb-2" />
+                                <div className="text-xs text-gray-400 font-medium">NO SEAT</div>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
 
@@ -172,7 +226,6 @@ const PassengerBooking = () => {
                 </button>
               </div>
 
-              {/* Expandable Flight Info */}
               {selectedFlight === flight.id && (
                 <div className="mt-3 p-3 sm:mt-4 sm:p-4 bg-gray-50 rounded-lg border-t border-gray-200">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm">
@@ -196,10 +249,6 @@ const PassengerBooking = () => {
         ))}
       </div>
 
-      {/* Load More */}
-      <div className="text-center mt-6 sm:mt-8">
-        <button className="text-amber-600 hover:text-amber-700 font-medium text-sm sm:text-base">Show more flights</button>
-      </div>
     </div>
   )
 }

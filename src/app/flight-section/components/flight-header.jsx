@@ -32,7 +32,7 @@ const FlightHeader = ({ theFlightInfo, flightPrice }) => {
                      {theFlightInfo.infants ? `Infants: ${theFlightInfo.infants}`: ""}
                 </div>
                 <div>
-                      <h1>{theFlightInfo.return ? "Round Trip": "One Way"}</h1>
+                      <h1>{theFlightInfo.trip_type === "round" ? "Round Trip": "One Way"}</h1>
                 </div>
             </div>
         </div>
