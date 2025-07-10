@@ -22,8 +22,9 @@ const FlightHeader = ({ theFlightInfo, flightPrice }) => {
                 <h1 className='font-bold text-md'>{`${theFlightInfo.from} - ${theFlightInfo.to}`}</h1>
             </div>
             <div className='grid grid-cols-3'>
-                <div>
+                <div className='mr-3'>
                     <span className='font-semibold text-white'>Departure: </span> {theFlightInfo.departure}
+                    <br />
                     {theFlightInfo.return ?  `Return: ${theFlightInfo.return}`: ""}
                 </div>
                 <div className='border-x border-gray-200  px-3'>
@@ -39,7 +40,7 @@ const FlightHeader = ({ theFlightInfo, flightPrice }) => {
 
         {/* Price Section */}
         <div className="text-right text-sm font-semibold text-black w-full md:w-auto">
-          {flightPrice ? `Total Price: $${flightPrice}` : "Price Not Found"}
+          {flightPrice ? `Total Price: GHc ${flightPrice}` : "Price Not Found"}
         </div>
       </div>
     </div>

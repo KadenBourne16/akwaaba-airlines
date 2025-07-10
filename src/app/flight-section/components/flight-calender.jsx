@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+"use client"
+import React, { useState,useEffect } from 'react';
 import { Plane, StarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 
 function get7DatesFromOffset(offset = 0) {
@@ -12,7 +13,7 @@ function get7DatesFromOffset(offset = 0) {
   return dates;
 }
 
-const FlightCalendar = () => {
+const FlightCalendar = ({setCurrentDate}) => {
   const [offset, setOffset] = useState(0);
   const [selectedDate, setSelectedDate] = useState(new Date().toDateString());
 
@@ -20,6 +21,10 @@ const FlightCalendar = () => {
   today.setHours(0, 0, 0, 0);
 
   const dates = get7DatesFromOffset(offset);
+
+  useEffect(() => {
+    setCurrentDate(selectedDate);
+  }, [selectedDate])
 
   return (
     <div className="flex flex-col items-center justify-center w-full px-4 py-6">

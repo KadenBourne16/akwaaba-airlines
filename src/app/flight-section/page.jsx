@@ -36,6 +36,12 @@ const FlightSection = () => {
     setFlightPrice(random_generatedPrice);
     
   }, [])
+
+  useEffect(() => {
+    // location.reload();
+    console.log("reloaded")
+    console.log(currentDate)
+  }, [currentDate])
   
   const renderPageSection = () => {
     switch (currentStep) {
@@ -43,7 +49,7 @@ const FlightSection = () => {
         return (
           <div>
             <FlightCalender setCurrentDate={setCurrentDate}/>
-            <PassengerBooking/>
+            <PassengerBooking currentDate={currentDate}/>
           </div>
         )
       case 1:

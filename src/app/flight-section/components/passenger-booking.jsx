@@ -64,10 +64,12 @@ function generateAvailableSeat(location_from, location_to) {
 }
 
 // Main component
-const PassengerBooking = () => {
+const PassengerBooking = ({currentDate}) => {
   const [selectedFlight, setSelectedFlight] = useState(null)
   const [flights, setFlights] = useState([])
-  const [currentDate  , setCurrentDate] = useState(false);
+
+
+
 
   const fareClasses = [
     {
@@ -98,7 +100,7 @@ const PassengerBooking = () => {
     let usedTimes = new Set()
     const theFlightData = localStorage.getItem("flightFormData")
     const flightData = JSON.parse(theFlightData)
-
+  
     for (let i = 0; i < numFlights; i++) {
       let hour = getRandomInt(6, 20)
       let minute = getRandomInt(0, 1) === 0 ? 0 : 30
@@ -109,25 +111,26 @@ const PassengerBooking = () => {
         depTime = `${pad(hour)}:${pad(minute)}`
       }
       usedTimes.add(depTime)
-
+  
       const arrTime = addMinutesToTime(depTime, 50)
       const seatPrices = generateAvailableSeat(flightData.from, flightData.to)
       const duration = caculateFlightDuration(flightData.from, flightData.to)
-
+  
       flightsArr.push({
         id: `AK${pad(i + 1)}`,
         departureTime: depTime,
         arrivalTime: arrTime,
         departureCity: flightData.from,
         arrivalCity: flightData.to,
-        date: "05.07.2025",
+        date: currentDate, // use currentDate dynamically
         duration: `${duration}h`,
         flightType: "Nonstop",
         seatPrices,
       })
     }
     setFlights(flightsArr)
-  }, [])
+  }, [currentDate]) // ✅ Watch for changes
+  
 
   const handleFlightInfo = (flightId) => {
     setSelectedFlight(selectedFlight === flightId ? null : flightId)

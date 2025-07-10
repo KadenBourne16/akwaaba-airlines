@@ -51,7 +51,7 @@ useEffect(() => {
       from: destinationSelected.from,
       to: destinationSelected.to,
       departure: departureDate,
-      return: tripType === "one" ? returnDate : "",
+      return: tripType === "round" ? returnDate : "",
       trip_type: tripType,
     }));
 
@@ -59,35 +59,37 @@ useEffect(() => {
   }, [destinationSelected, departureDate, returnDate, tripType]);
 
 
-const saveToIndexedDB = (formData) => {
-  let newErrors = {};
-
-  if (!formData.from) {
-    newErrors.from = "Please select a departure location";
+  const saveToIndexedDB = (formData) => {
+    let newErrors = {};
+  
+    if (!formData.from) {
+      newErrors.from = "Please select a departure location";
+    }
+    if (!formData.to) {
+      newErrors.to = "Please select a destination";
+    }
+    if (!formData.departure) {
+      newErrors.departure = "Please select a departure date";
+    }
+    // ✅ Corrected logic here
+    if (formData.trip_type === "round" && !formData.return) {
+      newErrors.return = "Please select a return date";
+    }
+  
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setTimeout(() => {
+        setErrors({});
+      }, 3000);
+      return;
+    }
+  
+    const dataToStore = JSON.stringify(formData);
+    localStorage.setItem("flightFormData", dataToStore);
+    console.log("Done", dataToStore)
+    router.push("/flight-section")
   }
-  if (!formData.to) {
-    newErrors.to = "Please select a destination";
-  }
-  if (!formData.departure) {
-    newErrors.departure = "Please select a departure date";
-  }
-  if (formData.trip_type !== "round" && !formData.return) {
-    newErrors.return = "Please select a return date";
-  }
-
-  if (Object.keys(newErrors).length > 0) {
-    setErrors(newErrors);
-    setTimeout(() => {
-      setErrors({});
-    }, 3000);
-    return;
-  }
-
-  const dataToStore = JSON.stringify(formData);
-  localStorage.setItem("flightFormData", dataToStore);
-  console.log("Done", dataToStore)
-  router.push("/flight-section")
-}
+  
 
   const destinations = [
     {
