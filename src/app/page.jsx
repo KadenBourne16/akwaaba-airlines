@@ -181,7 +181,12 @@ useEffect(() => {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: 'url("/placeholder.svg?height=600&width=1200")',
+            backgroundImage: 'url("/FlyingCommercialPlane.jpg")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            backgroundColor: '#000', // optional fallback
+            opacity: 0.5,
           }}
         ></div>
 
@@ -190,7 +195,7 @@ useEffect(() => {
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
               Fly with <span className="text-amber-400">Akwaaba</span> Airlines
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100">
+            <p className="text-xl md:text-2xl mb-8 text-white font-black">
               Experience the warmth of Ghanaian hospitality at 30,000 feet. Your journey begins with us.
             </p>
 
