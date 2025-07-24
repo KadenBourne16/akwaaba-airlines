@@ -5,6 +5,7 @@ import FlightHeader from './components/flight-header'
 import FlightCalender from './components/flight-calender'
 import PassengerBooking from './components/passenger-booking'
 import { Plane, Calendar, Clock, MapPin } from "lucide-react"
+import PassengerDetails from './components/passenger-details'
 
 const steps = [
   "Flight Section",
@@ -110,9 +111,9 @@ const FlightSection = () => {
                     onClick={() => setSelectedFlightInformation(null)}
                     className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100"
                   >
-                    Back
+                    Cancel
                   </button>
-                  <button className="px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700">
+                  <button onClick={() => setCurrentStep(1)} className="px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700">
                     Confirm Booking
                   </button>
                 </div>
@@ -127,7 +128,7 @@ const FlightSection = () => {
       case 1:
         return (
           <div>
-            Passenger
+              <PassengerDetails/>
           </div>
         )
       case 2:
