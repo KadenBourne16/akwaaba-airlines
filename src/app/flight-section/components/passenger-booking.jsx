@@ -64,9 +64,10 @@ function generateAvailableSeat(location_from, location_to) {
 }
 
 // Main component
-const PassengerBooking = ({currentDate}) => {
+const PassengerBooking = ({currentDate, setSelectedFlightInformation}) => {
   const [selectedFlight, setSelectedFlight] = useState(null)
   const [flights, setFlights] = useState([])
+  const [flightFormData, setFlightFormData] = useState(null)
 
 
 
@@ -100,6 +101,7 @@ const PassengerBooking = ({currentDate}) => {
     let usedTimes = new Set()
     const theFlightData = localStorage.getItem("flightFormData")
     const flightData = JSON.parse(theFlightData)
+    setFlightFormData(flightData)
   
     for (let i = 0; i < numFlights; i++) {
       let hour = getRandomInt(6, 20)
@@ -132,8 +134,21 @@ const PassengerBooking = ({currentDate}) => {
   }, [currentDate]) // ✅ Watch for changes
   
 
-  const handleFlightInfo = (flightId) => {
-    setSelectedFlight(selectedFlight === flightId ? null : flightId)
+  const handleFlightSelect = (flight, fareClass, price) => {
+    if (!price) return; // Don't select if no price available
+    
+    const selectedFlightData = {
+      ...flight,
+      selectedFareClass: fareClass,
+      selectedPrice: price,
+      passengerInfo: flightFormData,
+      bookingDate: new Date().toISOString(),
+      bookingReference: `AKW-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+    };
+    
+    setSelectedFlight(selectedFlightData);
+    setSelectedFlightInformation(selectedFlightData);
+    localStorage.setItem('selectedFlight', JSON.stringify(selectedFlightData));
   }
 
   return (
@@ -197,20 +212,27 @@ const PassengerBooking = ({currentDate}) => {
                     const price = flight.seatPrices[fareClass.name]
                     return (
                       <div key={index} className="w-20 sm:w-24 text-center">
-                        <div >
-                          {price ? (
-                            <div className="border border-gray-200 rounded-lg p-2 sm:p-4 bg-green-500 hover:bg-green-400 hover:cursor-pointer">
-                              <Plane className="w-5 h-5 sm:w-6 sm:h-6 text-white mx-auto mb-1 sm:mb-2" />
-                              <div className="text-xs text-white font-semibold">₵{price}</div>
-                            </div>
-                          ) : (
-                            <div className="border border-gray-200 rounded-lg p-2 sm:p-4 bg-gray-50">
-                              <Plane className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300 mx-auto mb-1 sm:mb-2" />
-                                <div className="text-xs text-gray-400 font-medium">NO SEAT</div>
-                            </div>
-                          )}
-                        </div>
+                      <div>
+                        {price ? (
+                          <div 
+                            className={`border rounded-lg p-2 sm:p-4 hover:cursor-pointer transition-colors duration-200 ${
+                              selectedFlight?.id === flight.id && selectedFlight?.selectedFareClass === fareClass.name
+                                ? 'border-amber-500 bg-amber-500 text-white'
+                                : 'border-gray-200 bg-green-500 hover:bg-green-400 text-white'
+                            }`}
+                            onClick={() => handleFlightSelect(flight, fareClass.name, price)}
+                          >
+                            <Plane className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 sm:mb-2" />
+                            <div className="text-xs font-semibold">₵{price}</div>
+                          </div>
+                        ) : (
+                          <div className="border border-gray-200 rounded-lg p-2 sm:p-4 bg-gray-50">
+                            <Plane className="w-5 h-5 sm:w-6 sm:h-6 text-gray-300 mx-auto mb-1 sm:mb-2" />
+                            <div className="text-xs text-gray-400 font-medium">NO SEAT</div>
+                          </div>
+                        )}
                       </div>
+                    </div>
                     )
                   })}
                 </div>

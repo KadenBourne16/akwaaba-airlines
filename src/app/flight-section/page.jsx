@@ -4,6 +4,7 @@ import Location_Library from "@/json-library/location-distance.json"
 import FlightHeader from './components/flight-header'
 import FlightCalender from './components/flight-calender'
 import PassengerBooking from './components/passenger-booking'
+import { Plane, Calendar, Clock, MapPin } from "lucide-react"
 
 const steps = [
   "Flight Section",
@@ -24,7 +25,8 @@ const FlightSection = () => {
   })
   const [theFlightInfo, setTheFlightInfo] = useState({})
   const [flightPrice, setFlightPrice] = useState(0)
-  const [currentDate, setCurrentDate] = useState("")
+  const [currentDate, setCurrentDate] = useState("");
+  const [selectedFlightInformation, setSelectedFlightInformation] = useState({})
 
   useEffect(() =>{
     const flight_data_information = localStorage.getItem("flightFormData")
@@ -38,18 +40,88 @@ const FlightSection = () => {
   }, [])
 
   useEffect(() => {
-    // location.reload();
-    console.log("reloaded")
-    console.log(currentDate)
-  }, [currentDate])
-  
+    console.log(selectedFlightInformation);
+  }, [selectedFlightInformation])
+
   const renderPageSection = () => {
     switch (currentStep) {
       case 0:
         return (
           <div>
             <FlightCalender setCurrentDate={setCurrentDate}/>
-            <PassengerBooking currentDate={currentDate}/>
+            {selectedFlightInformation && selectedFlightInformation.id ? (
+              <div className="border rounded-2xl shadow-md p-6 max-w-2xl mx-auto bg-white space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="text-xl font-bold text-amber-600">Flight {selectedFlightInformation.id || 'N/A'}</div>
+                  <div className="text-sm text-gray-500">
+                    {selectedFlightInformation.bookingReference && `Booking Ref: ${selectedFlightInformation.bookingReference}`}
+                  </div>
+                </div>
+        
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-lg font-semibold">{selectedFlightInformation.departureCity || 'N/A'}</p>
+                    <p className="text-gray-500">{selectedFlightInformation.departureTime || ''}</p>
+                  </div>
+                  <Plane className="w-6 h-6 text-gray-400" />
+                  <div>
+                    <p className="text-lg font-semibold">{selectedFlightInformation.arrivalCity || 'N/A'}</p>
+                    <p className="text-gray-500">{selectedFlightInformation.arrivalTime || ''}</p>
+                  </div>
+                </div>
+        
+                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>{selectedFlightInformation.date || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    <span>Duration: {selectedFlightInformation.duration || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>Trip: {selectedFlightInformation.passengerInfo?.trip_type || 'N/A'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold">Fare:</span>
+                    <span>
+                      {selectedFlightInformation.selectedFareClass || 'N/A'} - 
+                      GHS {selectedFlightInformation.selectedPrice || '0.00'}
+                    </span>
+                  </div>
+                </div>
+        
+                {selectedFlightInformation.passengerInfo && (
+                  <div className="text-sm text-gray-700">
+                    <p>
+                      Passengers: {selectedFlightInformation.passengerInfo.adults || 0} Adult(s),{" "}
+                      {selectedFlightInformation.passengerInfo.child || 0} Child(ren),{" "}
+                      {selectedFlightInformation.passengerInfo.infants || 0} Infant(s)
+                    </p>
+                    {selectedFlightInformation.passengerInfo.return && (
+                      <p>Return: {selectedFlightInformation.passengerInfo.return}</p>
+                    )}
+                  </div>
+                )}
+        
+                <div className="flex justify-end gap-3 pt-4">
+                  <button 
+                    onClick={() => setSelectedFlightInformation(null)}
+                    className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100"
+                  >
+                    Back
+                  </button>
+                  <button className="px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700">
+                    Confirm Booking
+                  </button>
+                </div>
+              </div>
+            ) : (
+            <div>
+                <PassengerBooking currentDate={currentDate} setSelectedFlightInformation={setSelectedFlightInformation}/>
+            </div>
+            )}
           </div>
         )
       case 1:
