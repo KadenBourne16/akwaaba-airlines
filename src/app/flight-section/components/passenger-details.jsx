@@ -186,6 +186,7 @@ const PassengerDetails = ({setCurrentStep}) => {
     } else {
       console.log("Final passenger list:", passengerFormList)
       localStorage.setItem("filledPassengerForms", JSON.stringify(passengerFormList))
+      setCurrentStep(2);
       // Navigate to next step or show completion message
     }
   }

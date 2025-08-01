@@ -171,6 +171,9 @@ useEffect(() => {
                 </a>
               ))}
             </nav>
+            <div>
+                <a href="/auth" className="bg-amber-400 text-white rounded-md py-2 px-5 font-semibold">Login</a>
+            </div>
           </div>
         </div>
       </header>

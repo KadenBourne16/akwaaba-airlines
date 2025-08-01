@@ -28,3 +28,17 @@ Apply these rates to calculate prices:
 5. Accra - Takoradi: 220 km * $0.10 = $22
 6. Tamale - Takoradi: 630 km * $0.15 = $94.50
 
+
+
+
+const AVERAGE_FLIGHT_SPEED = 500; // km/h
+
+function getFlightDuration(distanceKm) {
+  const durationHours = distanceKm / AVERAGE_FLIGHT_SPEED;
+  const hours = Math.floor(durationHours);
+  const minutes = Math.round((durationHours - hours) * 60);
+
+  return `${hours}h ${minutes}m`;
+}
+
+

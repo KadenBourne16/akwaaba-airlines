@@ -6,6 +6,7 @@ import FlightCalender from './components/flight-calender'
 import PassengerBooking from './components/passenger-booking'
 import {Users, X, Plane, Calendar, Clock, MapPin } from "lucide-react"
 import PassengerDetails from './components/passenger-details'
+import SeatMap from './components/seat-map'
 
 
 const steps = [
@@ -247,7 +248,8 @@ const FlightSection = () => {
       case 2:
         return (
           <div>
-            Additional Service Section
+              <button onClick={() => {setCurrentStep(1)}} className="bg-black text-white w-50 px-8 py-2 rounded-md hover:bg-gray-900 hover:cursor-pointer">Back</button>
+              <SeatMap selectedFlightInformation = {selectedFlightInformation}/>
           </div>
         )
       case 3:
