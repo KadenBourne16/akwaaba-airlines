@@ -1,11 +1,56 @@
 "use client"
 
-import { useState } from "react"
-import { Plane, ArrowLeft } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Plane } from "lucide-react"
 
-const SeatMap = ({selectedFlightInformation}) => {
+const SeatMap = ({ selectedFlightInformation, onSeatSelect }) => {
   const [selectedSeat, setSelectedSeat] = useState(null)
   const [selectedClass, setSelectedClass] = useState(null)
+  const [showPromotionPopup, setShowPromotionPopup] = useState(false)
+  
+  // Check if this is a promotion fare class
+  useEffect(() => {
+    if (selectedFlightInformation?.selectedFareClass?.toLowerCase() === 'promotion') {
+      setShowPromotionPopup(true);
+    }
+  }, [selectedFlightInformation])
+  
+  // Auto-select a random available seat based on fare class for all fare types
+  useEffect(() => {
+    if (!selectedFlightInformation?.selectedFareClass) return;
+    
+    const fareClass = selectedFlightInformation.selectedFareClass.toLowerCase();
+    
+    // Handle promotion class separately (shows popup)
+    if (fareClass === 'promotion') {
+      setShowPromotionPopup(true);
+      return;
+    }
+    
+    // Get all seats for the fare class
+    const allSeats = generateSeats()
+      .flatMap(section => section.seats)
+      .filter(seat => seat.class === fareClass);
+    
+    // Filter out occupied seats
+    const availableSeats = allSeats.filter(seat => !occupiedSeats.has(seat.id));
+    
+    // If no available seats, don't select anything
+    if (availableSeats.length === 0) {
+      console.warn(`No available seats for fare class: ${fareClass}`);
+      return;
+    }
+    
+    // Select a random available seat
+    const randomIndex = Math.floor(Math.random() * availableSeats.length);
+    const randomSeat = availableSeats[randomIndex];
+    
+    if (randomSeat) {
+      setSelectedSeat(randomSeat.id);
+      setSelectedClass(randomSeat.class);
+      onSeatSelect?.(randomSeat.id, randomSeat.class);
+    }
+  }, [selectedFlightInformation, onSeatSelect])
 
   // Generate seat positions for 50 seats
   // Gold: 2 rows x 4 seats = 8 seats (positions 1-8)
@@ -73,21 +118,18 @@ const SeatMap = ({selectedFlightInformation}) => {
     return "available"
   }
 
-  const handleSeatClick = (seat) => {
-    const status = getSeatStatus(seat.id)
-    if (status !== "occupied") {
-      setSelectedSeat(seat.id)
-      setSelectedClass(seat.class)
-      onSeatSelect?.(seat.id, seat.class)
-    }
+  const handleSeatClick = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    return false;
   }
 
   const getSeatColors = (seatClass, status) => {
     if (status === "occupied") {
-      return "bg-red-500 text-white cursor-not-allowed"
+      return "bg-black text-white cursor-not-allowed"
     }
     if (status === "selected") {
-      return "bg-amber-500 text-white shadow-lg scale-110 ring-2 ring-amber-300"
+      return "bg-green-500 text-white shadow-lg scale-110 ring-2 ring-green-300"
     }
 
     switch (seatClass) {
@@ -130,23 +172,52 @@ const SeatMap = ({selectedFlightInformation}) => {
     }
   }
 
+  // Close promotion popup
+  const handleClosePromotionPopup = () => {
+    setShowPromotionPopup(false);
+  };
+
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md relative">
+      {/* Promotion Popup */}
+      {showPromotionPopup && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+            <h3 className="text-xl font-bold text-red-600 mb-4">Important Notice</h3>
+            <p className="mb-4">
+              Your fare class is <span className="font-semibold">Promotion</span>.
+              Please contact Director Bambel for seat assignment and further assistance.
+            </p>
+            <div className="flex justify-end">
+              <button 
+                onClick={handleClosePromotionPopup}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Fare Class Indicator */}
+      {selectedFlightInformation?.selectedFareClass && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="text-blue-800 font-medium">
+            Fare Class: <span className="capitalize">{selectedFlightInformation.selectedFareClass.toLowerCase()}</span>
+            {selectedFlightInformation.selectedFareClass.toLowerCase() === 'gold' && (
+              <span className="ml-2 text-amber-600">• Your seat is pre-assigned as part of Gold Class service</span>
+            )}
+          </p>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
-          {onBack && (
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-white rounded-lg transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Flights
-            </button>
-          )}
-          <div>
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900">Select Your Seat</h1>
-            <p className="text-gray-600">Flight {flightId} - Choose your preferred seat</p>
+            <p className="text-gray-600">Flight {selectedFlightInformation?.id || ''} - Choose your preferred seat</p>
           </div>
         </div>
 
@@ -189,13 +260,13 @@ const SeatMap = ({selectedFlightInformation}) => {
             <span className="text-sm font-medium">Bronze Available</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-red-500 rounded text-white text-xs flex items-center justify-center font-bold">
+            <div className="w-6 h-6 bg-black rounded text-white text-xs flex items-center justify-center font-bold">
               1
             </div>
             <span className="text-sm font-medium">Occupied</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-amber-500 rounded text-white text-xs flex items-center justify-center font-bold shadow-lg">
+            <div className="w-6 h-6 bg-green-500 rounded text-white text-xs flex items-center justify-center font-bold shadow-lg">
               1
             </div>
             <span className="text-sm font-medium">Selected</span>
@@ -225,16 +296,17 @@ const SeatMap = ({selectedFlightInformation}) => {
                   const status = getSeatStatus(seat.id)
                   return (
                     <div key={seat.id} className="flex items-center">
-                      <button
-                        onClick={() => handleSeatClick(seat)}
-                        disabled={status === "occupied"}
-                        className={`w-10 h-10 rounded-lg text-sm font-bold transition-all duration-200 ${getSeatColors(
-                          seat.class,
-                          status,
-                        )}`}
+                      <div
+                        className={`w-10 h-10 rounded-lg text-sm font-bold flex items-center justify-center ${
+                          status === 'selected' 
+                            ? 'bg-green-500 text-white shadow-lg scale-110 ring-2 ring-green-300'
+                            : getSeatColors(seat.class, status)
+                        }`}
+                        onClick={handleSeatClick}
+                        style={{ cursor: 'default' }}
                       >
-                        1
-                      </button>
+                        {seat.position}
+                      </div>
                       {/* Aisle space after 2nd seat */}
                       {seatIndex === 1 && <div className="w-4"></div>}
                     </div>
@@ -268,7 +340,7 @@ const SeatMap = ({selectedFlightInformation}) => {
         {selectedSeat && (
           <div className="flex justify-center mt-8">
             <button className="px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-amber-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
-              Continue to Passenger Details
+              Continue to Payment
             </button>
           </div>
         )}
