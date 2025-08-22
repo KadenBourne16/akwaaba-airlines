@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Plane } from "lucide-react"
 
-const SeatMap = ({ selectedFlightInformation, onSeatSelect }) => {
+const SeatMap = ({ selectedFlightInformation, onSeatSelect, setCurrentStep }) => {
   const [selectedSeat, setSelectedSeat] = useState(null)
   const [selectedClass, setSelectedClass] = useState(null)
   const [showPromotionPopup, setShowPromotionPopup] = useState(false)
@@ -339,7 +339,7 @@ const SeatMap = ({ selectedFlightInformation, onSeatSelect }) => {
         {/* Continue Button */}
         {selectedSeat && (
           <div className="flex justify-center mt-8">
-            <button className="px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-amber-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <button onClick={() => {setCurrentStep(3)}} className="px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white font-semibold rounded-xl hover:from-amber-700 hover:to-amber-800 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
               Continue to Payment
             </button>
           </div>

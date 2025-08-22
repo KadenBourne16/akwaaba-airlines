@@ -4,10 +4,11 @@ import Location_Library from "@/json-library/location-distance.json"
 import FlightHeader from './components/flight-header'
 import FlightCalender from './components/flight-calender'
 import PassengerBooking from './components/passenger-booking'
-import {Users, X, Plane, Calendar, Clock, MapPin } from "lucide-react"
+import {Users, X, Plane, Calendar, Clock, MapPin, ArrowLeft } from "lucide-react"
 import PassengerDetails from './components/passenger-details'
 import SeatMap from './components/seat-map'
-
+import { useRouter } from 'next/navigation'
+import PaymentPage from './components/payment'
 
 const steps = [
   "Flight Section",
@@ -19,6 +20,7 @@ const steps = [
 
 
 const FlightSection = () => {
+
   const [currentStep, setCurrentStep] = useState(0)
   const [sectionName, setSectionName] = useState("")
   const [flightInformation, setFlightInformation] = useState({
@@ -30,6 +32,24 @@ const FlightSection = () => {
   const [flightPrice, setFlightPrice] = useState(0)
   const [currentDate, setCurrentDate] = useState("");
   const [selectedFlightInformation, setSelectedFlightInformation] = useState({})
+  const router = useRouter();
+  
+  const handlePaymentComplete = (paymentData) => {
+    console.log("Payment completed:", paymentData)
+    // Store payment data
+    localStorage.setItem("paymentResult", JSON.stringify(paymentData))
+    // Redirect to confirmation page
+    router.push("/booking-confirmation")
+  }
+  
+  const handleBack = () => {
+    router.back()
+  }
+
+
+
+
+
 
   useEffect(() =>{
     const flight_data_information = localStorage.getItem("flightFormData")
@@ -249,13 +269,40 @@ const FlightSection = () => {
         return (
           <div>
               <button onClick={() => {setCurrentStep(1)}} className="bg-black text-white w-50 px-8 py-2 rounded-md hover:bg-gray-900 hover:cursor-pointer">Back</button>
-              <SeatMap selectedFlightInformation = {selectedFlightInformation}/>
+              <SeatMap selectedFlightInformation = {selectedFlightInformation} setCurrentStep={setCurrentStep}/>
           </div>
         )
       case 3:
         return (
-          <div>
-            Payment Section
+          <div className="w-full max-w-4xl mx-auto">
+            <button 
+              onClick={() => setCurrentStep(2)}
+              className="flex items-center gap-2 text-amber-600 hover:text-amber-700 mb-6 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Back to Seat Selection
+            </button>
+
+            <div className='w-full max-w-4xl flex items-center justify-center mb-5"'>
+                <div className='border-2 border-red-600 bg-red-200 rounded-md p-5 text-sm'>
+                      <span className='font-bold'>⚠️Note:</span> <p>Page is under development and so payment is not working yet</p>
+                </div>
+            </div>
+
+            <PaymentPage
+              bookingDetails={{
+                flightId: selectedFlightInformation.id || 'N/A',
+                totalAmount: selectedFlightInformation.selectedPrice || flightPrice.toFixed(2),
+                passengerCount: selectedFlightInformation.passengerInfo?.adults || 1,
+                bookingReference: `AK${Math.random().toString(36).substr(2, 8).toUpperCase()}`,
+                from: selectedFlightInformation.departureCity || 'N/A',
+                to: selectedFlightInformation.arrivalCity || 'N/A',
+                date: selectedFlightInformation.date || 'N/A',
+                time: selectedFlightInformation.departureTime || 'N/A'
+              }}
+              onPaymentComplete={handlePaymentComplete}
+              onBack={() => setCurrentStep(2)}
+            />
           </div>
         )
       case 4:
