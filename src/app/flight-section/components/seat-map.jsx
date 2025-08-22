@@ -186,7 +186,7 @@ const SeatMap = ({ selectedFlightInformation, onSeatSelect, setCurrentStep }) =>
             <h3 className="text-xl font-bold text-red-600 mb-4">Important Notice</h3>
             <p className="mb-4">
               Your fare class is <span className="font-semibold">Promotion</span>.
-              Please contact Director Bambel for seat assignment and further assistance.
+              Please contact AKWAABA SUPPORT TEAM for seat assignment and further assistance.
             </p>
             <div className="flex justify-end">
               <button 
